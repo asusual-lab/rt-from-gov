@@ -11,8 +11,9 @@ import shutil
 #scrap first page
 url="http://www.salute.gov.it/portale/nuovocoronavirus/dettaglioContenutiNuovoCoronavirus.jsp?area=nuovoCoronavirus&id=5351&lingua=italiano&menu=vuoto"
 response = request.urlopen(url).read()
-soup= BeautifulSoup(response, "html.parser")     
+soup= BeautifulSoup(response, "html.parser")  
 links = soup.find_all('a', href=re.compile(r'(dettaglioNotizieNuovoCoronavirus)'))
+print ("Successfully got links for the Monitoraggio page")
 #select first link of this type, should always appear as first
 myurl=links[0]["href"]
 
@@ -34,7 +35,7 @@ url_clean=[]
 for cc in url_list:
 	if 'Epi_aggiornam' in cc:
 		url_clean.append(cc)
-print(url_clean)
+#print(url_clean)
 
 
 #creation of a tmp dir
@@ -49,10 +50,11 @@ else:
 
 # download the pdfs to a specified location
 for url in url_clean:
-    print(url)
+    #print(url)
     fullfilename = os.path.join('/tmp/nuovi_rt', url.replace("http://www.salute.gov.it/portale/news/documenti/Epi_aggiornamenti/", ""))
-    print(fullfilename)
+    #print(fullfilename)
     request.urlretrieve(url, fullfilename)
+
 
 # extract rt data
 files = glob.glob("{}/*.pdf".format(path))
@@ -62,10 +64,13 @@ for url in files:
 	region = url.split("_")[-2]
 	rt = reader.getPage(1).extractText().split("Rt:")[1].strip().split(" (CI")[0]
 	italia_reg[region] = rt
+print ("Successfully got RT from PDF files")
+
 
 # write a js 
 with open('Rt_{}.js'.format(url.split("_")[-1].strip(".pdf")), 'w') as outfile:
 	json.dump(italia_reg, outfile)
+print ("File Rt_{}.js created".format(url.split("_")[-1].strip(".pdf")))
 
 #remove tmp file
 shutil.rmtree(path)
