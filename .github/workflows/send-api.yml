@@ -1,10 +1,11 @@
+name: Push RT to API
 on:
   schedule:
     - cron: '23 3 * * *'
 
 jobs:
   run-script:
-    name: Push RT to API
+    
     runs-on: ubuntu-latest
     
     steps:
