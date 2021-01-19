@@ -12,16 +12,21 @@ import shutil
 url="http://www.salute.gov.it/portale/nuovocoronavirus/dettaglioContenutiNuovoCoronavirus.jsp?area=nuovoCoronavirus&id=5351&lingua=italiano&menu=vuoto"
 response = request.urlopen(url).read()
 soup= BeautifulSoup(response, "html.parser")  
-links = soup.find_all('a', href=re.compile(r'(dettaglioNotizieNuovoCoronavirus)'))
+links = soup.find_all('a')
+clean = [x for x in links if x.string != None]
+filtered_links = []
+for link in clean:
+	if "MONITORAGGIO" in link.string:
+		filtered_links.append(link)
 print ("Successfully got links for the Monitoraggio page")
 #select first link of this type, should always appear as first
-myurl=links[0]["href"]
-
+myurl=filtered_links[0]["href"]
 ####### Get Data From my page
 # connect to website and get list of all pdfs
 url="http://www.salute.gov.it"+myurl
+
 response = request.urlopen(url).read()
-soup= BeautifulSoup(response, "html.parser")     
+soup= BeautifulSoup(response, "html.parser")
 links = soup.find_all('a', href=re.compile(r'(.pdf)'))
 
 # clean the pdf link names
@@ -64,8 +69,8 @@ for url in files:
 	region = url.split("_")[-2]
 	rt = reader.getPage(1).extractText().split("Rt:")[1].strip().split(" (CI")[0]
 	italia_reg[region] = rt
+italia_reg["ultimo_aggiornamento"] = url.split("_")[-1].strip(".pdf")
 print ("Successfully got RT from PDF files")
-
 
 # write a js 
 with open('Rt_{}.js'.format(url.split("_")[-1].strip(".pdf")), 'w') as outfile:
