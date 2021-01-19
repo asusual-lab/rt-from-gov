@@ -1,13 +1,11 @@
 name: Push RT to API
 on:
+  workflow_dispatch:
   schedule:
     - cron: '*/4 * * * *'
-
 jobs:
   run-script:
-    
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
