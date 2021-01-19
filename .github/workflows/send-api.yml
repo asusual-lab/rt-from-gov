@@ -1,7 +1,7 @@
 name: Push RT to API
 on:
   schedule:
-    - cron: '23 3 * * *'
+    - cron: '*/4 * * * *'
 
 jobs:
   run-script:
