@@ -82,8 +82,8 @@ print ("File Rt_{}.js created".format(url.split("_")[-1].strip(".pdf")))
 shutil.rmtree(path)
 
 
-API_ENDPOINT = "http://localhost:1337/regions"
-TOKEN = "123456789"
+API_ENDPOINT = os.environ("API_ENDPOINT", "http://localhost:1337/regions")
+API_TOKEN = os.environ("API_TOKEN", "123456789")
 
 params = { 'token': TOKEN }
 
