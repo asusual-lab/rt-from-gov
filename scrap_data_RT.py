@@ -67,10 +67,10 @@ italia_reg = {}
 italia_reg["data"] = {}
 for url in files:
 	reader = PyPDF2.PdfFileReader(url)
-	region = url.split("_")[-2]
+	region = url.split("_")[-2].lower().replace("-","")
 	rt = reader.getPage(1).extractText().split("Rt:")[1].strip().split(" (CI")[0]
 	italia_reg["data"][region] = rt
-italia_reg["ultimo_aggiornamento"] = url.split("_")[-1].strip(".pdf")
+italia_reg["ultimoAggiornamento"] = url.split("_")[-1].strip(".pdf")
 print ("Successfully got RT from PDF files")
 
 # write a js 
