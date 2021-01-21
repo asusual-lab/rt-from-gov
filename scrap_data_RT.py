@@ -1,6 +1,5 @@
 from urllib import request
 from bs4 import BeautifulSoup
-import requests
 import re
 import os
 import urllib
@@ -67,39 +66,16 @@ files = glob.glob("{}/*.pdf".format(path))
 italia_reg = {}
 for url in files:
 	reader = PyPDF2.PdfFileReader(url)
-	region = url.split("_")[-2].replace("-", "").lower()
+	region = url.split("_")[-2]
 	rt = reader.getPage(1).extractText().split("Rt:")[1].strip().split(" (CI")[0]
 	italia_reg[region] = rt
-# italia_reg["ultimo_aggiornamento"] = url.split("_")[-1].strip(".pdf")
-print("{} regions found".format(len(italia_reg.keys())))
-print("Successfully got RT from PDF files")
+italia_reg["ultimo_aggiornamento"] = url.split("_")[-1].strip(".pdf")
+print ("Successfully got RT from PDF files")
 
 # write a js 
-with open('Rt_{}.js'.format(url.split("_")[-1].strip(".pdf")), 'w') as outfile:
+with open('Rt_file.js', 'w') as outfile:
 	json.dump(italia_reg, outfile)
-print ("File Rt_{}.js created".format(url.split("_")[-1].strip(".pdf")))
+print ("File Rt_file.js created")
+
 #remove tmp file
 shutil.rmtree(path)
-
-
-API_ENDPOINT = os.getenv ("API_ENDPOINT", "http://localhost:1337/regions")
-API_TOKEN = os.getenv ("API_TOKEN", "123456789")
-
-params = { 'token': API_TOKEN }
-
-# Getting regions to use id for update
-regions = requests.get(API_ENDPOINT, params=params).json()
-
-count = 0
-
-for region in regions: 
-	if region['name'] in italia_reg.keys():
-		res = requests.put("{}/{}".format(API_ENDPOINT, region['id']), params=params, json={"rtIndex": italia_reg[region['name']]})
-		if res.status_code == 200: 
-			count += 1
-		else:
-			print("Failed to update {} - Status {} - Error {}".format(region['name'],res.status_code,res.text))
-	else:
-		print("{} not in retrieved RTs, please check italia_reg object to match regions in API")
-
-print("Updated {} regions - Ciao !".format(count)) 
