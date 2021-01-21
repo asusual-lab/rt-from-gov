@@ -26,4 +26,3 @@ jobs:
       with:
         commit_message: Update RT files - Actions
         commit_author: Actions <actions@github.com>
-        file_pattern: '*.js'
