@@ -64,11 +64,12 @@ for url in url_clean:
 # extract rt data
 files = glob.glob("{}/*.pdf".format(path))
 italia_reg = {}
+italia_reg["data"] = {}
 for url in files:
 	reader = PyPDF2.PdfFileReader(url)
 	region = url.split("_")[-2]
 	rt = reader.getPage(1).extractText().split("Rt:")[1].strip().split(" (CI")[0]
-	italia_reg[region] = rt
+	italia_reg["data"][region] = rt
 italia_reg["ultimo_aggiornamento"] = url.split("_")[-1].strip(".pdf")
 print ("Successfully got RT from PDF files")
 
