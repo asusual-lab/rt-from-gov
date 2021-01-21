@@ -22,3 +22,8 @@ jobs:
         API_TOKEN: ${{ secrets.API_TOKEN }}
       run: |
         python scrap_data_RT.py
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Update RT files - Actions
+        commit_author: Actions <actions@github.com>
+        file_pattern: *.js 
