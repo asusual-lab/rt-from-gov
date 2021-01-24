@@ -22,7 +22,7 @@ def delta(dicta):
 	for region in dicta["data"]:
 		current = float(dicta["data"][region]["current"])
 		previous = float(dicta["data"][region]["previous"])
-		dicta["data"][region]["delta"] = "="
+		dicta["data"][region]["delta"] = ""
 		if current>previous:
 			dicta["data"][region]["delta"]="+"
 		elif current<previous:
