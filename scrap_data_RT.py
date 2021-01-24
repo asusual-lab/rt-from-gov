@@ -91,7 +91,7 @@ for n,url in enumerate(url_list):
 			Date = "previous"
 		reader = PyPDF2.PdfFileReader(pdf)
 		#print(pdf) 
-		Region = pdf.split("Epi_aggiornamento_")[-1].lower().replace("-","")[:-13].replace("_","")
+		Region = pdf.split("Epi_aggiornamento_")[-1].lower().replace("-","")[:-13].replace("_","").lstrip("pa")
 		rt_value = reader.getPage(1).extractText().split("Rt:")[1].strip().split(" (CI")[0]
 		if Region not in italia_RT["data"]:
 			italia_RT["data"][Region] = {}
