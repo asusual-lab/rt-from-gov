@@ -90,7 +90,8 @@ for n,url in enumerate(url_list):
 		else:
 			Date = "previous"
 		reader = PyPDF2.PdfFileReader(pdf)
-		Region = pdf.split("_")[-2].lower().replace("-","")
+		#print(pdf) 
+		Region = pdf.split("Epi_aggiornamento_")[-1].lower().replace("-","")[:-13].replace("_","")
 		rt_value = reader.getPage(1).extractText().split("Rt:")[1].strip().split(" (CI")[0]
 		if Region not in italia_RT["data"]:
 			italia_RT["data"][Region] = {}
@@ -98,8 +99,8 @@ for n,url in enumerate(url_list):
 		else:
 			italia_RT["data"][Region][Date] = rt_value			
 	italia_RT["ultimoAggiornamento"] = ultimoAggiornamento
-	print ("Successfully got RT from PDF files")
-
+print ("Successfully got RT from PDF files")
+#print(italia_RT)
 #add delta info
 delta(italia_RT)
 
