@@ -12,11 +12,11 @@ import shutil
 #creation of a tmp dir
 def create_dir(dirname):
 	try:
-	    os.makedirs(dirname)
+		os.makedirs(dirname)
 	except OSError:
-	    print ("Creation of the directory %s failed" % dirname)
+		print ("Creation of the directory %s failed" % dirname)
 	else:
-	    print ("Successfully created the directory %s" % dirname)
+		print ("Successfully created the directory %s" % dirname)
 
 def delta(dicta):
 	for region in dicta["data"]:
@@ -33,14 +33,14 @@ def delta(dicta):
 path = "/tmp/nuovi_rt"
 
 #scrap first page
-url="http://www.salute.gov.it/portale/nuovocoronavirus/dettaglioContenutiNuovoCoronavirus.jsp?area=nuovoCoronavirus&id=5351&lingua=italiano&menu=vuoto"
+url="http://www.salute.gov.it/portale/nuovocoronavirus/archivioMonitoraggiNuovoCoronavirus.jsp"
 response = request.urlopen(url).read()
 soup= BeautifulSoup(response, "html.parser")  
 links = soup.find_all('a')
 clean = [x for x in links if x.string != None]
 filtered_links = []
 for link in clean:
-	if "MONITORAGGIO" in link.string:
+	if "monitoraggio" in link.string.lower():
 		filtered_links.append(link)
 print ("Successfully got links for the Monitoraggio page")
 #select first link of this type, should always appear as first
@@ -51,58 +51,58 @@ previous_link=filtered_links[1]["href"]
 prefix = "http://www.salute.gov.it"
 url_list=[prefix+last_link,prefix+previous_link]
 
-pdf_list = []
-direct_links_pdf=[]
+pdf_list = {}
 create_dir(path)
 ultimoAggiornamento=""
+italia_RT = {}
+italia_RT["data"] = {}
 for n,url in enumerate(url_list):
 	response = request.urlopen(url).read()
 	soup= BeautifulSoup(response, "html.parser")
-	links = soup.find_all('a', href=re.compile(r'(.pdf)'))
+	links = soup.find_all('a', href=re.compile(r'(egionale.pdf)'))
 
 	# clean the pdf link names
 	for el in links:
+		regione = el["title"].replace(" ","").strip().replace("-","").lower()
+		if "bolzano" in regione:
+			regione = "bolzano"
+		if "trento" in regione:
+			regione = "trento"
+		if "valle" in regione:
+			regione = "valledaosta"
 		if (el['href'].startswith('http')):
-			pdf_list.append(el['href'])
+			pdf_list[regione] = el['href']
 		else:
-			pdf_list.append("http://www.salute.gov.it" + el['href'])
-	for cc in pdf_list:
-		if 'Epi_aggiornam' in cc:
-			direct_links_pdf.append(cc)
-			if n==0:
-				ultimoAggiornamento=cc.split("_")[-1].strip(".pdf")
+			pdf_list[regione] = "http://www.salute.gov.it" + el['href'] 
 	
 	# download the pdfs to a specified location
-	for direct in direct_links_pdf:
-	    #print(url)
-	    fullfilename = os.path.join(path, direct.replace("http://www.salute.gov.it/portale/news/documenti/Epi_aggiornamenti/", ""))
-	    #print(fullfilename)
-	    request.urlretrieve(direct, fullfilename)
+	for Region in pdf_list:
+		#print(url)
+		fullfilename = os.path.join(path, Region + ".pdf")
+		#print(fullfilename)
+		request.urlretrieve(pdf_list[Region], fullfilename)		
 
 	# extract rt data
 	files = glob.glob("{}/*.pdf".format(path))
-	italia_RT = {}
-	italia_RT["data"] = {}
 	for pdf in files:
-		Date=pdf.split("_")[-1].strip(".pdf")
-		if Date == ultimoAggiornamento:
+		Region = pdf.split("/")[-1].replace(".pdf","")
+		if n == 0:
 			Date = "current"
 		else:
 			Date = "previous"
 		reader = PyPDF2.PdfFileReader(pdf)
 		#print(pdf) 
-		Region = pdf.split("Epi_aggiornamento_")[-1].lower().replace("-","")[:-13].replace("_","")
-		if Region == "patrento":
-			Region = Region.replace("patrento","trento")
-		if Region == "pabolzano":
-			Region = Region.replace("pabolzano","bolzano")
 		rt_value = reader.getPage(1).extractText().split("Rt:")[1].strip().split(" (CI")[0]
 		if Region not in italia_RT["data"]:
 			italia_RT["data"][Region] = {}
 			italia_RT["data"][Region][Date] = rt_value
 		else:
 			italia_RT["data"][Region][Date] = rt_value			
-	italia_RT["ultimoAggiornamento"] = ultimoAggiornamento
+	if n == 0:
+		dadata = reader.getPage(0).extractText().split("aggiornati al")[1].strip().replace(")","").split("/")
+		if '0' not in dadata[1] and len(dadata[1]) == 1:
+			dadata[1] = '0'+dadata[1]
+		italia_RT["ultimoAggiornamento"] = dadata[2]+dadata[1]+dadata[0]
 print ("Successfully got RT from PDF files")
 #print(italia_RT)
 #add delta info
