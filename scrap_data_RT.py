@@ -102,7 +102,7 @@ for n,url in enumerate(url_list):
 		dadata = reader.getPage(0).extractText().split("aggiornati al")[1].strip().replace(")","").split("/")
 		if '0' not in dadata[1] and len(dadata[1]) == 1:
 			dadata[1] = '0'+dadata[1]
-		italia_RT["ultimoAggiornamento"] = dadata[2]+dadata[1]+dadata[0]
+		italia_RT["ultimoAggiornamento"] = dadata[2].strip()+dadata[1].strip()+dadata[0].strip()
 print ("Successfully got RT from PDF files")
 #print(italia_RT)
 #add delta info
