@@ -100,9 +100,16 @@ for n,url in enumerate(url_list):
 			italia_RT["data"][Region][Date] = rt_value			
 	if n == 0:
 		dadata = reader.getPage(0).extractText().split("aggiornati al")[1].strip().replace(")","").split("/")
-		if '0' not in dadata[1] and len(dadata[1]) == 1:
-			dadata[1] = '0'+dadata[1]
-		italia_RT["ultimoAggiornamento"] = dadata[2].replace("\n","")+dadata[1].replace("\n","")+dadata[0].replace("\n","")
+		#print(dadata) #['7\n', '\n4\n', '2021']
+		newda = []
+		for da in dadata:
+			da = da.replace("\n","")
+			if '0' not in da and len(da) == 1:
+				da = '0'+da
+			newda.append(da)
+		italia_RT["ultimoAggiornamento"] = newda[2]+newda[1]+newda[0]
+		#print(italia_RT)
+		#exit()
 print ("Successfully got RT from PDF files")
 #print(italia_RT)
 #add delta info
