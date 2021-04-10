@@ -80,7 +80,11 @@ for n,url in enumerate(url_list):
 		#print(url)
 		fullfilename = os.path.join(path, Region + ".pdf")
 		#print(fullfilename)
-		request.urlretrieve(pdf_list[Region], fullfilename)		
+		try:
+			request.urlretrieve(pdf_list[Region], fullfilename)
+		except urllib2.HTTPError:
+			print ('There was an error with the request')
+				
 
 	# extract rt data
 	files = glob.glob("{}/*.pdf".format(path))
