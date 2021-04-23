@@ -82,7 +82,7 @@ for n,url in enumerate(url_list):
 		#print(fullfilename)
 		try:
 			request.urlretrieve(pdf_list[Region], fullfilename)
-		except urllib2.HTTPError:
+		except urllib.HTTPError:
 			print ('There was an error with the request')
 				
 
